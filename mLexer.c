@@ -65,63 +65,38 @@ int lex(LexState * state) {
   }
   // Match non-terminal
   if (tokenType == T_NOMATCH) {
-    if (isalpha(state->currentChar)) {
+    if (isdigit(state->currentChar)) {
       accept(state);
-      while (isalpha(state->currentChar)
-             || isdigit(state->currentChar) || state->currentChar == '_') {
-        accept(state);
-      };
-      tokenType = T_ID;
-    } else if (isdigit(state->currentChar)) {
-      accept(state);
-      while (isdigit(state->currentChar) || state->currentChar == '.') {
+      while (isdigit(state->currentChar)) {
         accept(state);
       };
       tokenType = T_NUMBER;
+    } else if (state->currentChar == '\n') {
+        accept(state);
+        tokenType = T_NEWLINE;
     } else if (isspace(state->currentChar)) {
       while (isspace(state->currentChar)) {
         accept(state);
       }
       tokenType = T_SPACE;
-    } else if (state->currentChar == '"') {
-      next(state);
-      while (state->currentChar != '"') {
-        accept(state);
-      }
-      if (state->currentChar == '"') {
-        next(state);
-        tokenType = T_STRING;
-      } 
     } else if (state->currentChar == '(') {
       accept(state);
       tokenType = T_LPAREN;
     } else if (state->currentChar == ')') {
       accept(state);
       tokenType = T_RPAREN;
-    } else if (state->currentChar == '{') {
-      accept(state);
-      tokenType = T_LCBRACE;
-    } else if (state->currentChar == '}') {
-      accept(state);
-      tokenType = T_RCBRACE;
-    } else if (state->currentChar == ';') {
-      accept(state);
-      tokenType = T_SEMICOLON;
-    } else if (state->currentChar == '|') {
-      accept(state);
-      tokenType = T_PIPE;
-    } else if (state->currentChar == ',') {
-      accept(state);
-      tokenType = T_COMMA;
-    } else if (state->currentChar == ':') {
-      accept(state);
-      tokenType = T_COLON;
-    } else if (state->currentChar == '#') {
-      accept(state);
-      while (state->currentChar != '\n') {
+    } else if (state->currentChar == '+') {
         accept(state);
-      }
-      tokenType = T_COMMENT;
+        tokenType = T_PLUS;
+    } else if (state->currentChar == '-') {
+        accept(state);
+        tokenType = T_MINUS;
+    } else if (state->currentChar == '*') {
+        accept(state);
+        tokenType = T_MULTIPLY;
+    } else if (state->currentChar == '/') {
+        accept(state);
+        tokenType = T_DIVIDE;
     }
   }
   if (tokenType != T_NOMATCH) {

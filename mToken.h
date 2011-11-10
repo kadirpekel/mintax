@@ -24,20 +24,16 @@ enum {
   T_NOMATCH,
   T_EOF,
   // Non-Terminal Tokens
-  T_ID,
   T_NUMBER,
   T_SPACE,
-  T_STRING,
-  T_COMMENT,
+  T_NEWLINE,
   // Terminal Tokens
-  T_COMMA,
   T_LPAREN,
   T_RPAREN,
-  T_LCBRACE,
-  T_RCBRACE,
-  T_COLON,
-  T_SEMICOLON,
-  T_PIPE
+  T_PLUS,
+  T_MINUS,
+  T_MULTIPLY,
+  T_DIVIDE
 };
 
 #endif

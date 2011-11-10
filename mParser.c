@@ -26,8 +26,7 @@
 
 static void next(ParserState* state) {
   state->currentToken = lex(state->lexState);
-  while(state->currentToken == T_COMMENT
-    || state->currentToken == T_SPACE) {
+  while(state->currentToken == T_SPACE) {
     state->currentToken = lex(state->lexState);
   }
 }
@@ -42,56 +41,32 @@ static int accept(ParserState* state, int token) {
 }
 
 int expression(ParserState* state);
-int lambda(ParserState* state);
-int program(ParserState* state);
-int statement(ParserState* state);
+int term(ParserState* state);
+int factor(ParserState* state);
 
-int expression(ParserState* state) {
-  if (accept(state, T_ID)) {
-    if (accept(state, T_LPAREN)) {
-      while(expression(state) && accept(state, T_COMMA));
-      if (!accept(state, T_RPAREN)) {
-        return 0;
-      }
+int expression (ParserState* state) {
+    if (term(state)) {
+        while((accept(state, T_PLUS) || accept(state, T_MINUS)) && term(state));
+        return 1;
     }
-    return 1;
-  } else if(lambda(state) || accept(state, T_NUMBER) || accept(state, T_STRING)) {
-    return 1;
-  }
-  return 0;
+    return 0;
 }
 
-int lambda(ParserState* state) {
-  if(accept(state, T_PIPE)) {
-    while(accept(state, T_ID) && accept(state, T_COMMA));
-    if (!accept(state, T_PIPE)) {
-      return 0;
+int term (ParserState* state) {
+    if (factor(state)) {
+        while((accept(state, T_MULTIPLY) || accept(state, T_DIVIDE)) && factor(state));
+        return 1;
     }
-  }
-  if(accept(state, T_LCBRACE)) {
-    program(state);
-    if(!accept(state, T_RCBRACE)) {
-      return 0;
-    }
-    return 1;
-  }
-  return 0;
+    return 0;
+}
+
+int factor (ParserState* state) {
+    return accept(state, T_NUMBER) || (accept(state, T_LPAREN) && expression(state) && accept(state, T_RPAREN));
 }
 
 int program(ParserState* state) {
-  while((statement(state) || expression(state)) && accept(state, T_SEMICOLON));
+  while(expression(state) && accept(state, T_NEWLINE));
   return 1;
-}
-
-int statement(ParserState* state) {
-  if (accept(state, T_COLON) && accept(state, T_ID)) {
-    if (!expression(state)) {
-      return 0;
-    }
-    log("statement");
-    return 1;
-  }
-  return 0;
 }
 
 void initParserState(ParserState * parserState, LexState * lexState) {
